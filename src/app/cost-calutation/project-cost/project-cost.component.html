@@ -4,13 +4,13 @@
   </div>
   <div class="item">
     <button class="button">
-      <mat-button-toggle-group name="fontStyle" aria-label="Font Style">
-        <mat-button-toggle *ngFor="let item of this.resourceList" value="bold">{{item.title}}</mat-button-toggle>
+      <mat-button-toggle-group name="fontStyle" (change)="loadTreeDataByButton($event)" aria-label="Font Style">
+        <mat-button-toggle *ngFor="let item of this.resourceList" [value]="item.id">{{item.title}}</mat-button-toggle>
       </mat-button-toggle-group>
     </button></div>
   <div class="item">
     <div>
-      <h1>Total Cost:{{totalCost()}}</h1>
+      <h1>Total Cost:{{total}}</h1>
     </div>
     <div>
       <p>Project manger:{{pmCost}}</p>
@@ -25,7 +25,7 @@
   </div>
 
 </div>
-<mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="example-tree">
+<mat-tree #treeSelector [dataSource]="dataSource" [treeControl]="treeControl" class="example-tree">
   <!-- This is the tree node template for leaf nodes -->
   <!-- There is inline padding applied to this node using styles.
     This padding value depends on the mat-icon-button width. -->

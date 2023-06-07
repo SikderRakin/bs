@@ -1,14 +1,8 @@
 export class CostClass {
   static RESOURCES_LIST = [
-    {
-      title: 'PM',
-    },
-    {
-      title: 'Developer',
-    },
-    {
-      title: 'QA',
-    },
+    { id: 2, title: 'PM' },
+    { id: 1, title: 'Developer' },
+    { id: 3, title: 'QA' },
   ];
 
   static TREE_DATA_OF_RESOURCES = {

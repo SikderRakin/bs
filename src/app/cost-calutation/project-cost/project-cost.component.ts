@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CostClass } from '../constant/constant';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { MatTreeNestedDataSource, MatTreeModule } from '@angular/material/tree';
+import { ServiceService } from 'src/app/service.service';
+import { Subject, takeUntil } from 'rxjs';
 
 /**
  * Food data with nested structure.
@@ -14,13 +16,7 @@ interface ResourceNode {
   children?: ResourceNode[];
 }
 
-const TREE_DATA: ResourceNode[] = [
-  {
-    name: 'Developer',
-    id: 1,
-    cost: 1000,
-    children: [{ id: 3, cost: 500, name: 'QA' }],
-  },
+const PM_DATA: ResourceNode[] = [
   {
     name: 'PM',
     id: 2,
@@ -38,6 +34,23 @@ const TREE_DATA: ResourceNode[] = [
   { id: 3, cost: 500, name: 'QA' },
 ];
 
+const QA_DATA: ResourceNode[] = [
+  {
+    name: 'QA',
+    id: 1,
+    cost: 1000,
+  },
+];
+
+const DEVELOPER_DATA: ResourceNode[] = [
+  {
+    name: 'Developer',
+    id: 1,
+    cost: 1000,
+    children: [{ id: 3, cost: 500, name: 'QA' }],
+  },
+];
+
 @Component({
   selector: 'app-project-cost',
   templateUrl: './project-cost.component.html',
@@ -46,21 +59,55 @@ const TREE_DATA: ResourceNode[] = [
 export class ProjectCostComponent implements OnInit {
   treeControl = new NestedTreeControl<ResourceNode>((node) => node.children);
   dataSource = new MatTreeNestedDataSource<ResourceNode>();
-
+  @ViewChild('treeSelector') tree: any;
+  private unsubscribe$ = new Subject<void>();
   resourceList: any[] = [];
 
   developerCost: number = 0;
   pmCost: number = 0;
   qaCost: number = 0;
-
-  constructor() {}
+  total: number = 0;
+  constructor(private serviceService: ServiceService) {
+    this.dataSource.data = PM_DATA;
+  }
 
   hasChild = (_: number, node: ResourceNode) =>
     !!node.children && node.children.length > 0;
 
   ngOnInit(): void {
-    this.dataSource.data = TREE_DATA;
     this.resourceList = CostClass.RESOURCES_LIST;
+    this.serviceService.dataSubject
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((data) => {
+        // Handle the received data here
+        if (data === 'reset') {
+          this.totalCost(data);
+        }
+      });
+  }
+  onChange() {
+    // Perform the necessary changes to the data source here
+    // For example, update the TREE_DATA array with new data
+
+    // Call renderNodeChanges() to re-render the tree
+    this.tree.renderNodeChanges(this.dataSource.data);
+  }
+  loadTreeDataByButton(value: any) {
+    switch (value) {
+      case 1:
+        this.dataSource.data = [...DEVELOPER_DATA];
+        break;
+      case 2:
+        this.dataSource.data = [...PM_DATA];
+        this.tree.renderNodeChanges(this.dataSource.data);
+        break;
+      case 3:
+        this.dataSource.data = [...QA_DATA];
+        this.tree.renderNodeChanges(this.dataSource.data);
+        break;
+      default:
+        break;
+    }
   }
 
   // calculate cost  when checked
@@ -100,6 +147,7 @@ export class ProjectCostComponent implements OnInit {
     } else {
       this.developerCost = this.developerCost - cost;
     }
+    this.totalCost();
   }
 
   calculateQa(cost: number, action: string) {
@@ -108,6 +156,7 @@ export class ProjectCostComponent implements OnInit {
     } else {
       this.qaCost = this.qaCost - cost;
     }
+    this.totalCost();
   }
 
   calculatePm(cost: number, action: string) {
@@ -116,9 +165,16 @@ export class ProjectCostComponent implements OnInit {
     } else {
       this.pmCost = this.pmCost - cost;
     }
+    this.totalCost();
   }
 
-  totalCost() {
-    return this.pmCost + this.qaCost + this.developerCost;
+  totalCost(action?: string) {
+    if (action === 'reset') {
+      this.pmCost = 0;
+      this.qaCost = 0;
+      this.developerCost = 0;
+      this.total = 0;
+    }
+    this.total = this.pmCost + this.qaCost + this.developerCost;
   }
 }
