@@ -8,7 +8,7 @@ describe('ProjectCostComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [ProjectCostComponent]
+      declarations: [ProjectCostComponent],
     });
     fixture = TestBed.createComponent(ProjectCostComponent);
     component = fixture.componentInstance;
@@ -17,5 +17,9 @@ describe('ProjectCostComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+  it('should calculate numbers correctly', () => {
+    const result = component.totalCost();
+    expect(result).toEqual();
   });
 });
