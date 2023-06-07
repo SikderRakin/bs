@@ -54,29 +54,42 @@ export class ProjectCostComponent implements OnInit {
   qaCost: number = 0;
 
   constructor() {}
+
   hasChild = (_: number, node: ResourceNode) =>
     !!node.children && node.children.length > 0;
+
   ngOnInit(): void {
     this.dataSource.data = TREE_DATA;
     this.resourceList = CostClass.RESOURCES_LIST;
   }
 
+  // calculate cost  when checked
   onChecked(node: any, event: any) {
     if (event.checked) {
-      if (node.id == 1) {
-        this.calculateDeveloper(node.cost, 'add');
-      } else if (node.id == 2) {
-        this.calculateQa(node.cost, 'add');
-      } else if (node.id == 3) {
-        this.calculateQa(node.cost, 'add');
+      switch (node.id) {
+        case 1:
+          this.calculateDeveloper(node.cost, 'add');
+          break;
+        case 2:
+          this.calculateQa(node.cost, 'add');
+          break;
+        case 3:
+          this.calculateQa(node.cost, 'add');
+          break;
+        default:
+          break;
       }
     } else {
-      if (node.id == 1) {
-        this.calculateDeveloper(node.cost, 'sub');
-      } else if (node.id == 2) {
-        this.calculateQa(node.cost, 'sub');
-      } else if (node.id == 3) {
-        this.calculateQa(node.cost, 'sub');
+      switch (node.id) {
+        case 1:
+          this.calculateDeveloper(node.cost, 'sub');
+          break;
+        case 2:
+        case 3:
+          this.calculateQa(node.cost, 'sub');
+          break;
+        default:
+          break;
       }
     }
   }
@@ -88,6 +101,7 @@ export class ProjectCostComponent implements OnInit {
       this.developerCost = this.developerCost - cost;
     }
   }
+
   calculateQa(cost: number, action: string) {
     if (action === 'add') {
       this.qaCost = this.qaCost + cost;
@@ -95,6 +109,7 @@ export class ProjectCostComponent implements OnInit {
       this.qaCost = this.qaCost - cost;
     }
   }
+
   calculatePm(cost: number, action: string) {
     if (action === 'add') {
       this.pmCost = this.pmCost + cost;
